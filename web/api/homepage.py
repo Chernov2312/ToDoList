@@ -1,38 +1,20 @@
-from fastapi import APIRouter
+__all__ = ()
 from enum import Enum
 
-from main import templates
+from fastapi import APIRouter, Request
+
+from config.templates_config import templates
 
 
 class Tags(Enum):
-    users = "users"
-    items = "items"
-    item = 'item'
+    homepage = 'Главная страница'
 
 
 homepage_router = APIRouter()
 
 
-@homepage_router.get('/v1/item_info', tags=[Tags.item])
-async def item_info(request):
-    context = {
-        "id": id,
-        "user_name": "Алексей"
-    }
+@homepage_router.get('/homepage', tags=[Tags.homepage])
+async def item_info(request: Request):
     return templates.TemplateResponse(
-        request=request,
-        name="item.html",
-        context=context
-    )
-
-@homepage_router.get()
-async def item_list(request):
-    context = {
-        "id": id,
-        "user_name": "Алексей"
-    }
-    return templates.TemplateResponse(
-        request=request,
-        name="item.html",
-        context=context
+        request=request, name='todo/home.html',
     )

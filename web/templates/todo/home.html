@@ -1,43 +1,8 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block title %}Главная страница{% endblock %}
-
-{% block head %}
-  <link rel="stylesheet" href="{% static 'css/homepage.css' %}">
-{% endblock %}
-
-{% block content %}
-  <div class="homepage-hero-wrap">
-    <div class="homepage-hero">
-      <h1 class="homepage-title">Добро пожаловать в PersonVille!</h1>
-
-      <div class="homepage-description">
-        <p>
-          <strong>PersonVille</strong> — это место, где характер можно не только описать, но и увидеть.
-          Твои ответы собираются в город с улицами, домами и атмосферой, которая отражает твой способ общаться,
-          чувствовать, действовать и меняться. Вместо сухого результата ты получаешь цельный образ своего
-          PersonVille — визуальный, игровой и при этом удивительно узнаваемый.
-        </p>
-      </div>
-
-      <a
-        class="homepage-test-button"
-        href="#"
-        data-first-url="{% url 'quizzes:first' %}"
-        data-restart-url="{% url 'quizzes:restart' %}"
-        onclick="return handleTestStart(
-          {% if request.session.city_result %}true{% else %}false{% endif %},
-          this.dataset.firstUrl,
-          this.dataset.restartUrl
-        )"
-      >
-        Пройти тест
-      </a>
-    </div>
+{% block maincontent %}
+  <div class="container">
+    <p>Вы на главной</p>
   </div>
 {% endblock %}
-
-{% block script %}
-  <script src="{% static 'js/restart_homepage.js' %}"></script>
-{% endblock script %}

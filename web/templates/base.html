@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-{% load static %}
 <html lang="ru">
   <head>
     <meta charset="utf-8">
@@ -12,8 +11,12 @@
     {% block head %}{% endblock head %}
   </head>
   <body>
-    <header></header>
-    <main></main>
-    <footer></footer>
+    <header>{%include 'includes/header.html'%}</header>
+    <main>
+      {% block maincontent %}
+        
+      {% endblock maincontent %}
+    </main>
+    <footer>{%include 'includes/footer.html'%}</footer>
   </body>
 </html>
