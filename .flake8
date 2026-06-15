@@ -14,6 +14,7 @@ exclude =
     manage.py
     /static/
 
+ignore = N805
 max-line-length = 79
 import-order-style = google
 application-import-names = web, api, config, db, schemas

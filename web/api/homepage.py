@@ -13,8 +13,9 @@ class Tags(Enum):
 homepage_router = APIRouter()
 
 
-@homepage_router.get('/homepage', tags=[Tags.homepage])
+@homepage_router.get('', tags=[Tags.homepage])
 async def item_info(request: Request):
     return templates.TemplateResponse(
-        request=request, name='todo/home.html',
+        request=request,
+        name='todo/home.html',
     )

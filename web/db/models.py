@@ -7,8 +7,8 @@ from db.database import Base
 
 class User(Base):
     username: Mapped[str] = mapped_column(String(25), nullable=False)
-    password: Mapped[str] = mapped_column(String(60), nullable=False)
-    email: Mapped[str] = mapped_column(String(60), nullable=False)
+    password: Mapped[str] = mapped_column(String(250), nullable=False)
+    email: Mapped[str] = mapped_column(String(250), nullable=False)
     tasks: Mapped[list['Task']] = relationship(
         'Task',
         back_populates='user',

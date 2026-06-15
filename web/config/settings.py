@@ -3,12 +3,15 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class AppConfig(BaseSettings):
-    SECRET_KEY: str
     POSTGRES_HOST: str
     POSTGRES_DB: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_PORT: int = 5432
+
+    SECRET_KEY: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ALGORITHM: str
 
     model_config = SettingsConfigDict(
         env_file='.env',
