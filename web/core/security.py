@@ -10,13 +10,14 @@ from pwdlib import PasswordHash
 
 from config import settings
 from db.dao import UserDAO
-from schemas.verification import TokenData, User
+from schemas.user import User
+from schemas.verification import TokenData, UserAuth
 
 password_hash = PasswordHash.recommended()
 
 DUMMY_HASH = password_hash.hash('dummypassword')
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='core/token')
 
 
 def verify_password(plain_password, hashed_password):
@@ -34,7 +35,7 @@ def authenticate_user(username: str, password: str):
         return False
     if not verify_password(password, user.hashed_password):
         return False
-    return User.model_validate(user)
+    return UserAuth.model_validate(user)
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):

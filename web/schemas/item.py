@@ -1,11 +1,12 @@
 __all__ = ()
-from typing import List, Optional
+from typing import Optional
+from uuid import UUID
 
 from pydantic import BaseModel, Field
 
 
-class Item(BaseModel):
-    id: int
+class Task(BaseModel):
+    id: UUID
     title: str = Field(
         ...,
         min_length=3,
@@ -18,4 +19,3 @@ class Item(BaseModel):
         max_length=250,
         description='Описание',
     )
-    tasks: List[dict] = Field(..., description='Список заданий')

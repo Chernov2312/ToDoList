@@ -1,21 +1,20 @@
 __all__ = ()
-from enum import Enum
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Request
 
 from config import Tags, templates
 from core.security import get_current_active_user
-from schemas.verification import User
+from schemas.user import UserProfile
 
-user_router = APIRouter(tags=Tags.user)
+user_router = APIRouter(tags=[Tags.user])
 
 
 @user_router.get('/users/me/', description='Профиль')
 async def get_profile(
     request: Request,
-    current_user: Annotated[User, Depends(get_current_active_user)],
-) -> User:
+    current_user: Annotated[UserProfile, Depends(get_current_active_user)],
+) -> UserProfile:
     return templates.TemplateResponse(
         request=request,
         name='todo/profile',

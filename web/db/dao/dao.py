@@ -1,9 +1,10 @@
 __all__ = ()
-from dao.base import BaseDAO
-from database import connection
-from models import Task, User
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from db.dao.base import BaseDAO
+from db.database import connection
+from db.models import Task, User
 
 
 class UserDAO(BaseDAO):

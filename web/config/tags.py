@@ -7,3 +7,4 @@ class Tags(Enum):
     catalog = 'Каталог'
     user = 'Пользователь'
     auth = 'Веретификация'
+    core = 'Основное Api'

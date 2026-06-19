@@ -1,22 +1,18 @@
 __all__ = ()
-from datetime import timedelta
-from typing import Annotated
-
-from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
+from fastapi import APIRouter, Form, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError
 
-from config import Tags, settings, templates
-from core.security import authenticate_user, create_access_token
+from config import Tags, templates
+from core.security import authenticate_user
 from db.dao import UserDAO
-from schemas.verification import Token, User
+from schemas.verification import UserAuth
 
-auth = APIRouter(tags=Tags.auth)
+auth_router = APIRouter(tags=[Tags.auth])
 
 
-@auth.get('/register', response_class=HTMLResponse)
+@auth_router.get('/register', response_class=HTMLResponse)
 async def register_page(request: Request):
     return templates.TemplateResponse(
         request=request,
@@ -28,7 +24,7 @@ async def register_page(request: Request):
     )
 
 
-@auth.post('/register', response_class=HTMLResponse)
+@auth_router.post('/register', response_class=HTMLResponse)
 async def register_user(
     request: Request,
     username: str = Form(...),
@@ -38,7 +34,7 @@ async def register_user(
     form_data = {'username': username, 'email': email, 'password': password}
     errors = {}
     try:
-        _ = User(**form_data)
+        _ = UserAuth(**form_data)
     except ValidationError as e:
         for error in e.errors():
             field = error['loc'][0]
@@ -75,7 +71,7 @@ async def register_user(
     )
 
 
-@auth.get('/login', response_class=HTMLResponse)
+@auth_router.get('/login', response_class=HTMLResponse)
 async def login_page(request: Request, registered: bool):
     return templates.TemplateResponse(
         request=request,
@@ -88,25 +84,23 @@ async def login_page(request: Request, registered: bool):
     )
 
 
-@auth.post('/login')
-async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-) -> Token:
-    user = authenticate_user(
-        form_data.username,
-        form_data.password,
-    )
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Неверное имя пользователя или пароль',
-            headers={'WWW-Authenticate': 'Bearer'},
+@auth_router.post('/login', response_class=HTMLResponse)
+async def login_user(
+    request: Request,
+    username: str = Form(...),
+    password: str = Form(...),
+):
+    if authenticate_user(username=username, password=password):
+        return templates.TemplateResponse(
+            request=request,
+            name='auth/todo.html',
+            context={},
         )
-    access_token_expires = timedelta(
-        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
+    return templates.TemplateResponse(
+        request=request,
+        name='auth/register.html',
+        context={
+            'form_data': {},
+            'errors': {},
+        },
     )
-    access_token = create_access_token(
-        data={'sub': user.username},
-        expires_delta=access_token_expires,
-    )
-    return Token(access_token=access_token, token_type='bearer')
