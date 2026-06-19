@@ -3,13 +3,7 @@ from enum import Enum
 
 from fastapi import APIRouter
 
-from config.templates_config import templates
-
-
-class Tags(Enum):
-    items = 'Ассортимент'
-    item = 'Инвормация о товаре'
-
+from config import Tags, templates
 
 catalog_router = APIRouter()
 

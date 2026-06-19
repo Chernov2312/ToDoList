@@ -1,0 +1,115 @@
+<!-- templates/register.html -->
+{% extends 'base.html' %}
+
+{% block title %}Регистрация - ToDO{% endblock title %}
+
+{% block maincontent %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="card register-card">
+                <div class="card-body">
+                    <h1 class="card-title text-center mb-2">Создать аккаунт</h1>
+                    <p class="card-subtitle text-center mb-4">Присоединяйтесь к нам</p>
+
+                    <form method="POST" action="{{ url_for('register') }}" novalidate>
+                        <!-- Username -->
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-semibold">Имя пользователя</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input 
+                                    type="text" 
+                                    class="form-control {% if errors and errors.username %}is-invalid{% endif %}" 
+                                    id="username" 
+                                    name="username" 
+                                    placeholder="Введите имя пользователя"
+                                    value="{{ form_data.username if form_data else '' }}"
+                                    required
+                                    autofocus
+                                >
+                            </div>
+                            {% if errors and errors.username %}
+                                <div class="invalid-feedback d-block">{{ errors.username }}</div>
+                            {% else %}
+                                <div class="form-text">От 3 до 20 символов, только буквы, цифры и _</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-semibold">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input 
+                                    type="email" 
+                                    class="form-control {% if errors and errors.email %}is-invalid{% endif %}" 
+                                    id="email" 
+                                    name="email" 
+                                    placeholder="example@mail.ru"
+                                    value="{{ form_data.email if form_data else '' }}"
+                                    required
+                                >
+                            </div>
+                            {% if errors and errors.email %}
+                                <div class="invalid-feedback d-block">{{ errors.email }}</div>
+                            {% else %}
+                                <div class="form-text">Введите действующий email</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <label for="password" class="form-label fw-semibold">Пароль</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                <input 
+                                    type="password" 
+                                    class="form-control {% if errors and errors.password %}is-invalid{% endif %}" 
+                                    id="password" 
+                                    name="password" 
+                                    placeholder="Введите пароль"
+                                    required
+                                >
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            {% if errors and errors.password %}
+                                <div class="invalid-feedback d-block">{{ errors.password }}</div>
+                            {% else %}
+                                <div class="form-text">Минимум 8 символов, 1 цифра и 1 заглавная буква</div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="btn btn-register text-white w-100 mt-2">
+                            <i class="bi bi-person-plus me-2"></i>Зарегистрироваться
+                        </button>
+                    </form>
+
+                    <div class="register-link text-center mt-4">
+                        Уже есть аккаунт? <a href="{{ url_for('login') }}">Войти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Показать/скрыть пароль
+document.getElementById('togglePassword')?.addEventListener('click', function() {
+    const password = document.getElementById('password');
+    const icon = this.querySelector('i');
+    if (password.type === 'password') {
+        password.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+    } else {
+        password.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+    }
+});
+</script>
+{% endblock maincontent %}

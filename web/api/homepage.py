@@ -2,18 +2,16 @@ __all__ = ()
 from enum import Enum
 
 from fastapi import APIRouter, Request
+from fastapi.responses import HTMLResponse
 
-from config.templates_config import templates
+from config import Tags, templates
 
-
-class Tags(Enum):
-    homepage = 'Главная страница'
-
-
-homepage_router = APIRouter()
+homepage_router = APIRouter(tags=Tags.homepage)
 
 
-@homepage_router.get('', tags=[Tags.homepage])
+@homepage_router.get(
+    '', description='Главная страница', response_class=HTMLResponse
+)
 async def item_info(request: Request):
     return templates.TemplateResponse(
         request=request,

@@ -9,6 +9,7 @@ from jwt.exceptions import InvalidTokenError
 from pwdlib import PasswordHash
 
 from config import settings
+from db.dao import UserDAO
 from schemas.verification import TokenData, User
 
 password_hash = PasswordHash.recommended()
@@ -26,16 +27,14 @@ def get_password_hash(password):
     return password_hash.hash(password)
 
 
-
-
 def authenticate_user(username: str, password: str):
-    user = get_user(username)
+    user = UserDAO.get_user(username)
     if not user:
         verify_password(password, DUMMY_HASH)
         return False
     if not verify_password(password, user.hashed_password):
         return False
-    return user
+    return User.model_validate(user)
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
@@ -71,7 +70,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         token_data = TokenData(username=username)
     except InvalidTokenError:
         raise credentials_exception
-    user = get_user(username=token_data.username)
+    user_db = UserDAO.get_user(username=token_data.username)
+    user = User.model_validate(user_db)
     if user is None:
         raise credentials_exception
     return user

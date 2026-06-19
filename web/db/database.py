@@ -4,10 +4,18 @@ from datetime import datetime
 from functools import wraps
 
 from sqlalchemy import UUID, func
-from sqlalchemy.ext.asyncio import (AsyncAttrs, AsyncSession,
-                                    async_sessionmaker, create_async_engine)
-from sqlalchemy.orm import (DeclarativeBase, Mapped, declared_attr,
-                            mapped_column)
+from sqlalchemy.ext.asyncio import (
+    AsyncAttrs,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    declared_attr,
+    mapped_column,
+)
 
 from config import settings
 
@@ -43,6 +51,7 @@ def connection(method):
             except Exception as e:
                 await session.rollback()
                 raise e
+
     return wrapper
 
 
