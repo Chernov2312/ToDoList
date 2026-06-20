@@ -1,0 +1,74 @@
+<footer class="bg-dark text-light py-5 mt-auto border-top border-secondary border-opacity-25">
+  <div class="container">
+    <div class="row gy-4">
+      
+      <!-- Блок 1: О проекте -->
+      <div class="col-lg-4 col-md-6">
+        <h5 class="fw-bold text-white mb-3">
+          <i class="fa-solid fa-list-check text-primary me-2"></i>ToDO
+        </h5>
+        <p class="small text-muted" style="max-width: 300px; line-height: 1.6;">
+          Современный инструмент для планирования задач, повышения продуктивности и организации ваших ежедневных дел.
+        </p>
+      </div>
+
+      <!-- Блок 2: Навигация -->
+      <div class="col-lg-2 col-md-6">
+        <h6 class="text-uppercase fw-bold text-white small mb-3">Навигация</h6>
+        <ul class="list-unstyled mb-0">
+          <li class="mb-2"><a href="#" class="text-muted text-decoration-none small hover-link">Главная</a></li>
+          <li class="mb-2"><a href="#" class="text-muted text-decoration-none small hover-link">Мои задачи</a></li>
+          <li class="mb-2"><a href="#" class="text-muted text-decoration-none small hover-link">Премиум</a></li>
+        </ul>
+      </div>
+
+      <!-- Блок 3: Справка -->
+      <div class="col-lg-2 col-md-6">
+        <h6 class="text-uppercase fw-bold text-white small mb-3">Помощь</h6>
+        <ul class="list-unstyled mb-0">
+          <li class="mb-2"><a href="#" class="text-muted text-decoration-none small hover-link">FAQ</a></li>
+          <li class="mb-2"><a href="#" class="text-muted text-decoration-none small hover-link">Поддержка</a></li>
+          <li class="mb-2"><a href="#" class="text-muted text-decoration-none small hover-link">Контакты</a></li>
+        </ul>
+      </div>
+
+      <!-- Блок 4: Соцсети и подписка -->
+      <div class="col-lg-4 col-md-6">
+        <h6 class="text-uppercase fw-bold text-white small mb-3">Мы в соцсетях</h6>
+        <div class="d-flex gap-3 mb-3">
+          <a href="#" class="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+            <i class="fa-brands fa-telegram text-white"></i>
+          </a>
+          <a href="#" class="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+            <i class="fa-brands fa-github text-white"></i>
+          </a>
+          <a href="#" class="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+            <i class="fa-brands fa-vk text-white"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Нижняя плашка с копирайтом -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mt-5 pt-4 border-top border-secondary border-opacity-25">
+      <p class="small text-muted mb-2 mb-sm-0">
+        &copy; {{ range(2025, 2027)|last }} ToDO Inc. Все права защищены.
+      </p>
+      <div class="d-flex gap-3">
+        <a href="#" class="text-muted text-decoration-none small hover-link">Конфиденциальность</a>
+        <a href="#" class="text-muted text-decoration-none small hover-link">Условия использования</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Небольшой стиль для плавного изменения цвета ссылок при наведении -->
+  <style>
+    .hover-link {
+      transition: color 0.2s ease-in-out;
+    }
+    .hover-link:hover {
+      color: #0d6efd !important; /* Цвет Bootstrap Primary при наведении */
+    }
+  </style>
+</footer>

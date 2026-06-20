@@ -1,0 +1,79 @@
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body p-4">
+        
+        <!-- Заголовок карточки -->
+        <div class="d-flex align-items-center mb-3">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-2 me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <i class="fa-solid fa-plus fs-5"></i>
+            </div>
+            <div>
+                <h5 class="card-title fw-bold text-dark mb-0">Новая задача</h5>
+                <p class="text-muted small mb-0">Что планируете сделать сегодня?</p>
+            </div>
+        </div>
+
+        <!-- Форма создания таска -->
+        <form action="{{ url_for('create_task') }}" method="POST">
+            
+            <!-- Поле: Название задачи -->
+            <div class="mb-3">
+                <input type="text" class="form-control form-control-lg border-light-subtle rounded-3 bg-light bg-opacity-50" 
+                       id="task_title" name="title" placeholder="Например: Купить молоко или Закодить форму" required autocomplete="off">
+            </div>
+
+            <!-- Поле: Описание задачи (необязательное) -->
+            <div class="mb-3">
+                <textarea class="form-control border-light-subtle rounded-3 bg-light bg-opacity-50" 
+                          id="task_description" name="description" rows="2" placeholder="Добавьте детали или заметки..."></textarea>
+            </div>
+
+            <!-- Дополнительные параметры: Дедлайн и Приоритет -->
+            <div class="row g-3 mb-4">
+                
+                <!-- Дата выполнения -->
+                <div class="col-sm-6">
+                    <label for="task_due_date" class="form-label small fw-semibold text-secondary">
+                        <i class="fa-regular fa-calendar me-1"></i> Срок выполнения
+                    </label>
+                    <input type="date" class="form-control border-light-subtle rounded-3 bg-light bg-opacity-50" 
+                           id="task_due_date" name="due_date">
+                </div>
+
+                <!-- Приоритет задачи -->
+                <div class="col-sm-6">
+                    <label for="task_priority" class="form-label small fw-semibold text-secondary">
+                        <i class="fa-solid fa-layer-group me-1"></i> Приоритет
+                    </label>
+                    <select class="form-select border-light-subtle rounded-3 bg-light bg-opacity-50" id="task_priority" name="priority">
+                        <option value="low" selected>Низкий</option>
+                        <option value="medium">Средний</option>
+                        <option value="high">Высокий 🔥</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- Кнопки управления -->
+            <div class="d-flex justify-content-end gap-2">
+                <button type="reset" class="btn btn-light rounded-3 px-4 fw-medium text-secondary">
+                    Очистить
+                </button>
+                <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold shadow-sm">
+                    Создать задачу
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<style>
+    /* Легкий фокус-эффект для полей ввода в карточке */
+    .card .form-control:focus, 
+    .card .form-select:focus {
+        background-color: #ffffff !important;
+        border-color: #0d6efd !important;
+        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15) !important;
+    }
+</style>

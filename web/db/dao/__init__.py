@@ -1,3 +1,3 @@
-from db.dao.dao import UserDAO
+from db.dao.dao import UserDAO, TaskDAO
 
-__all__ = ('UserDao',)
+__all__ = ('UserDao', 'TaskDAO')

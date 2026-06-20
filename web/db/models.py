@@ -1,5 +1,6 @@
 __all__ = ()
-from sqlalchemy import String
+from datetime import datetime
+from sqlalchemy import String, Date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.database import Base
@@ -21,4 +22,7 @@ class Task(Base):
         'User',
         back_populates='tasks',
     )
+    name: Mapped[str] = mapped_column(String(50), nullable=False)
     description: Mapped[str] = mapped_column(String(500), nullable=False)
+    deadline: Mapped[datetime] = mapped_column(Date, nullable=True)
+    
