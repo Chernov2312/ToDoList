@@ -13,7 +13,7 @@ class BaseDAO:
 
     @classmethod
     @connection
-    async def add(cls, values, session: AsyncSession):
+    async def add(cls, values, *, session: AsyncSession):
         new_instance = cls.model(**values)
         session.add(new_instance)
         try:

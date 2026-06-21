@@ -1,4 +1,5 @@
 __all__ = ()
+from uuid import UUID
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -31,4 +32,6 @@ class UserAuth(BaseModel):
         max_length=250,
         description='Почта',
     )
+
+    disabled: bool = False
     model_config = ConfigDict(from_attributes=True)

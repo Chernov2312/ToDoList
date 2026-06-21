@@ -1,10 +1,12 @@
 __all__ = ()
+from uuid import UUID
 from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
 
 class User(BaseModel):
+    id: Optional[UUID] = None
     username: str = Field(
         ...,
         min_length=3,
@@ -17,7 +19,7 @@ class User(BaseModel):
         max_length=250,
         description='Почта',
     )
-    tasks: List[dict] = Field(..., description='Список заданий')
+    disabled: Optional[bool] = None
     model_config = ConfigDict(from_attributes=True)
 
 

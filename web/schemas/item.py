@@ -1,6 +1,6 @@
 __all__ = ()
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field, model_validator
@@ -54,3 +54,7 @@ class Task(BaseModel):
 
             data['deadline'] = dt
         return data
+
+
+class Tasks(BaseModel):
+    tasks: List[Task]

@@ -10,8 +10,8 @@ from pwdlib import PasswordHash
 
 from config import settings
 from db.dao import UserDAO
-from schemas.user import User
 from schemas.verification import TokenData, UserAuth
+from schemas.user import User
 
 password_hash = PasswordHash.recommended()
 
@@ -45,7 +45,8 @@ class OAuth2PasswordBearerWithCookie(OAuth2PasswordBearer):
 
 
 oauth2_scheme = OAuth2PasswordBearerWithCookie(
-    tokenUrl='core/token', auto_error=True
+    tokenUrl='core/token',
+    auto_error=True,
 )
 
 

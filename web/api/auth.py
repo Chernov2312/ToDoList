@@ -15,6 +15,7 @@ from core.security import (
 )
 from db.dao import UserDAO
 from schemas.verification import UserAuth
+from schemas.user import User
 
 auth_router = APIRouter(tags=[Tags.auth])
 
@@ -41,31 +42,40 @@ async def register_user(
     form_data = {'username': username, 'email': email, 'password': password}
     errors = {}
     try:
-        _ = UserAuth(**form_data)
+        _ = User(**form_data)
     except ValidationError as e:
         for error in e.errors():
             field = error['loc'][0]
             errors[field] = error['msg']
     if not errors:
         existing_user = await UserDAO.get_user(username)
-        if existing_user is not None:
+        if existing_user is None:
             try:
                 form_data['password'] = get_password_hash(
                     form_data['password'],
                 )
                 await UserDAO.add(form_data)
             except IntegrityError as e:
-                if email in str(e):
-                    errors['email'] = 'Почта занята'
-                elif username in str(e):
-                    errors['username'] = (
-                        'Пользователь с таким именем уже существует'
+                error_msg = str(e).lower()
+                print(e)
+                if 'email' in error_msg and 'duplicate key' in error_msg:
+                    errors['email'] = (
+                        'Эта электронная почта уже зарегистрирована'
                     )
+                elif 'username' in error_msg and 'duplicate key' in error_msg:
+                    errors['username'] = 'Это имя пользователя уже занято'
+                else:
+                    errors['main'] = (
+                        'Пользователь с такими данными уже существует'
+                    )
+        else:
+            errors['username'] = 'Это имя пользователя уже занято'
 
     if errors:
+        print(errors)
         return templates.TemplateResponse(
             request=request,
-            name='register.html',
+            name='auth/register.html',
             context={
                 'form_data': form_data,
                 'errors': errors,
@@ -103,14 +113,14 @@ async def login_page(
 
 
 @auth_router.post('/login', response_class=HTMLResponse)
-async def login_for_browser(
+async def login_user(
     request: Request,
     username: str = Form(...),
     password: str = Form(...),
 ):
     user = await authenticate_user(username, password)
 
-    if user is None:
+    if not user:
         return templates.TemplateResponse(
             request=request,
             name='auth/login.html',
@@ -130,7 +140,8 @@ async def login_for_browser(
     )
 
     response = RedirectResponse(
-        url='/tasks', status_code=status.HTTP_303_SEE_OTHER,
+        url='/todo/v1/tasks',
+        status_code=status.HTTP_303_SEE_OTHER,
     )
     response.set_cookie(
         key='access_token',

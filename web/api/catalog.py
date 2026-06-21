@@ -9,6 +9,7 @@ from config import Tags, templates
 from core.security import get_current_active_user
 from db.dao import TaskDAO
 from schemas.item import Task
+from schemas.verification import UserAuth
 from schemas.user import User
 
 catalog_router = APIRouter(tags=[Tags.catalog])
@@ -18,7 +19,7 @@ catalog_router = APIRouter(tags=[Tags.catalog])
 async def task_info(
     request: Request,
     task: Task,
-    _: User = Depends(get_current_active_user),
+    _: UserAuth = Depends(get_current_active_user),
 ):
     context = {'Задание': task}
     return templates.TemplateResponse(
@@ -34,8 +35,10 @@ async def task_list(
     delete: Optional[str] = Cookie(None, alias='created_task'),
     user: User = Depends(get_current_active_user),
 ):
+    tasks = await TaskDAO.get_all_tasks(user.id)
+
     context = {
-        'tasks': user.tasks,
+        'tasks': tasks,
         'delete': delete == 'true',
     }
     return templates.TemplateResponse(
@@ -49,7 +52,7 @@ async def task_list(
 async def create_task_page(
     request: Request,
     created: Optional[str] = Cookie(None, alias='created_task'),
-    _: User = Depends(get_current_active_user),
+    _: UserAuth = Depends(get_current_active_user),
 ):
     return templates.TemplateResponse(
         request=request,
@@ -68,7 +71,7 @@ async def create_task(
     title: str = Form(...),
     description: str = Form(...),
     deadline: str = Form(...),
-    user: User = Depends(get_current_active_user),
+    user: UserAuth = Depends(get_current_active_user),
 ):
     form_data = {
         'title': title,
@@ -109,7 +112,7 @@ async def create_task(
 @catalog_router.post('/v1/delete')
 async def delete_task(
     task_id: str = Form(...),
-    user: User = Depends(get_current_active_user),
+    _: UserAuth = Depends(get_current_active_user),
 ):
     await TaskDAO.delete(task_id)
     response = RedirectResponse(
