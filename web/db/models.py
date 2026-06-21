@@ -1,6 +1,8 @@
 __all__ = ()
+import uuid
 from datetime import datetime
-from sqlalchemy import String, Date
+
+from sqlalchemy import Date, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.database import Base
@@ -22,7 +24,10 @@ class Task(Base):
         'User',
         back_populates='tasks',
     )
-    name: Mapped[str] = mapped_column(String(50), nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey('users.id', ondelete='CASCADE'),
+        nullable=False,
+    )
+    title: Mapped[str] = mapped_column(String(50), nullable=False)
     description: Mapped[str] = mapped_column(String(500), nullable=False)
     deadline: Mapped[datetime] = mapped_column(Date, nullable=True)
-    

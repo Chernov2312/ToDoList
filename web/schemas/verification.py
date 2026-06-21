@@ -1,7 +1,7 @@
 __all__ = ()
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class Token(BaseModel):
@@ -31,3 +31,4 @@ class UserAuth(BaseModel):
         max_length=250,
         description='Почта',
     )
+    model_config = ConfigDict(from_attributes=True)

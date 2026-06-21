@@ -1,7 +1,7 @@
 __all__ = ()
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class User(BaseModel):
@@ -18,6 +18,7 @@ class User(BaseModel):
         description='Почта',
     )
     tasks: List[dict] = Field(..., description='Список заданий')
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserProfile(BaseModel):

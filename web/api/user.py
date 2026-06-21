@@ -17,6 +17,6 @@ async def get_profile(
 ) -> UserProfile:
     return templates.TemplateResponse(
         request=request,
-        name='todo/profile',
+        name='user/profile',
         context=current_user.model_dump(),
     )

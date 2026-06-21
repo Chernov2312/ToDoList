@@ -5,12 +5,15 @@ from typing import Any, Dict, List
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from db.database import connection
+
 
 class BaseDAO:
     model = None
 
     @classmethod
-    async def add(cls, session: AsyncSession, **values):
+    @connection
+    async def add(cls, values, session: AsyncSession):
         new_instance = cls.model(**values)
         session.add(new_instance)
         try:
@@ -21,10 +24,11 @@ class BaseDAO:
         return new_instance
 
     @classmethod
+    @connection
     async def add_many(
         cls,
-        session: AsyncSession,
         instances: List[Dict[str, Any]],
+        session: AsyncSession,
     ):
         new_instances = [cls.model(**values) for values in instances]
         session.add_all(new_instances)

@@ -1,11 +1,18 @@
 __all__ = ()
-from fastapi import APIRouter, Form, Request, status
+from datetime import timedelta
+from typing import Optional
+
+from fastapi import APIRouter, Cookie, Form, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError
 
-from config import Tags, templates
-from core.security import authenticate_user
+from config import Tags, settings, templates
+from core.security import (
+    authenticate_user,
+    create_access_token,
+    get_password_hash,
+)
 from db.dao import UserDAO
 from schemas.verification import UserAuth
 
@@ -39,11 +46,13 @@ async def register_user(
         for error in e.errors():
             field = error['loc'][0]
             errors[field] = error['msg']
-
     if not errors:
-        existing_user = UserDAO.get_user(username)
-        if existing_user:
+        existing_user = await UserDAO.get_user(username)
+        if existing_user is not None:
             try:
+                form_data['password'] = get_password_hash(
+                    form_data['password'],
+                )
                 await UserDAO.add(form_data)
             except IntegrityError as e:
                 if email in str(e):
@@ -63,44 +72,72 @@ async def register_user(
             },
             status_code=status.HTTP_400_BAD_REQUEST,
         )
-
-    return RedirectResponse(
+    response = RedirectResponse(
         url='/auth/login',
         status_code=status.HTTP_303_SEE_OTHER,
-        registered=True,
     )
+    response.set_cookie(
+        key='registered',
+        value='true',
+        max_age=5,
+    )
+    return response
 
 
 @auth_router.get('/login', response_class=HTMLResponse)
-async def login_page(request: Request, registered: bool):
-    return templates.TemplateResponse(
+async def login_page(
+    request: Request,
+    registered: Optional[str] = Cookie(None, alias='registered'),
+):
+    registered = registered == 'true'
+    response = templates.TemplateResponse(
         request=request,
-        name='auth/register.html',
+        name='auth/login.html',
         context={
             'form_data': {},
             'errors': {},
             'registered': registered,
         },
     )
+    return response
 
 
 @auth_router.post('/login', response_class=HTMLResponse)
-async def login_user(
+async def login_for_browser(
     request: Request,
     username: str = Form(...),
     password: str = Form(...),
 ):
-    if authenticate_user(username=username, password=password):
+    user = await authenticate_user(username, password)
+
+    if user is None:
         return templates.TemplateResponse(
             request=request,
-            name='auth/todo.html',
-            context={},
+            name='auth/login.html',
+            context={
+                'form_data': {'username': username},
+                'errors': {'main': 'Неверное имя пользователя или пароль'},
+            },
+            status_code=status.HTTP_400_BAD_REQUEST,
         )
-    return templates.TemplateResponse(
-        request=request,
-        name='auth/register.html',
-        context={
-            'form_data': {},
-            'errors': {},
-        },
+
+    access_token_expires = timedelta(
+        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
     )
+    access_token = create_access_token(
+        data={'sub': user.username},
+        expires_delta=access_token_expires,
+    )
+
+    response = RedirectResponse(
+        url='/tasks', status_code=status.HTTP_303_SEE_OTHER,
+    )
+    response.set_cookie(
+        key='access_token',
+        value=f'Bearer {access_token}',
+        httponly=True,
+        samesite='lax',
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+    )
+
+    return response

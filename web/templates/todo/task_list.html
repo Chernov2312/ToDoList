@@ -44,7 +44,12 @@
             
             <!-- Здесь можно подключить ранее созданную карточку добавления -->
             {# {% include 'includes/create_task_card.html' %} #}
-
+            {% if delete %}
+                <div class="alert-success text-center">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                        Задание было успешно удалено
+                </div>
+            {% endif %}
             <!-- Заголовок списка -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4 class="fw-bold text-dark mb-0">

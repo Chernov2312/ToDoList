@@ -16,11 +16,11 @@ core_router = APIRouter(tags=[Tags.core])
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
-    user = authenticate_user(
+    user = await authenticate_user(
         form_data.username,
         form_data.password,
     )
-    if not user:
+    if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='Неверное имя пользователя или пароль',

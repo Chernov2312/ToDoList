@@ -12,8 +12,9 @@ class UserDAO(BaseDAO):
 
     @connection
     async def get_user(target_username: str, session: AsyncSession):
-        user: User = select(User).filter_by(username=target_username)
-        return user
+        query = select(User).filter_by(username=target_username)
+        result = await session.execute(query)
+        return result.scalar_one_or_none()
 
 
 class TaskDAO(BaseDAO):

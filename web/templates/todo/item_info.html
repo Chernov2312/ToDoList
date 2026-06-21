@@ -1,3 +1,182 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}Сведения{% endblock %}
+{% block title %}Задача: {{ task.title }} | ToDO{% endblock title %}
+
+{% block head %}
+<!-- Подключение FontAwesome для иконок -->
+<link rel="stylesheet" href="https://cloudflare.com">
+<style>
+    :root {
+        --panel-bg: #ffffff;
+        --input-bg: #f8fafc;
+        --border-color: #e2e8f0;
+        --text-muted: #64748b;
+        --focus-ring: 0 0 0 4px rgba(13, 110, 253, 0.15);
+    }
+
+    .task-info-wrapper {
+        min-height: calc(100vh - 160px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        background-color: #f1f5f9;
+    }
+
+    .task-info-card {
+        width: 100%;
+        max-width: 600px;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 2.5rem;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-control-custom, .form-select-custom {
+        background-color: var(--input-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+    }
+
+    .form-control-custom:focus, .form-select-custom:focus {
+        background-color: #ffffff;
+        border-color: #0d6efd;
+        box-shadow: var(--focus-ring);
+        outline: none;
+    }
+
+    .meta-info-zone {
+        background-color: var(--input-bg);
+        border-radius: 0.75rem;
+        border: 1px dashed var(--border-color);
+    }
+</style>
+{% endblock head %}
+
+{% block maincontent %}
+<div class="task-info-wrapper">
+    <div class="task-info-card">
+        
+        <!-- Навигация назад и статус -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a href="{{ url_for('tasks_list') }}" class="btn btn-link text-decoration-none text-secondary p-0 small fw-semibold">
+                <i class="fa-solid fa-arrow-left me-1"></i> Вернуться к списку
+            </a>
+            {% if task.is_completed %}
+                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-semibold">
+                    <i class="fa-solid fa-circle-check me-1"></i> Выполнена
+                </span>
+            {% else %}
+                <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2 fw-semibold">
+                    <i class="fa-solid fa-clock me-1"></i> В работе
+                </span>
+            {% endif %}
+        </div>
+
+        <!-- Заголовок страницы -->
+        <div class="mb-4">
+            <h1 class="h3 fw-bold text-dark mb-1">Детали задачи</h1>
+            <p class="text-muted small mb-0">Просмотр информации и редактирование параметров</p>
+        </div>
+
+        <!-- Основная форма редактирования -->
+        <form action="{{ url_for('edit_task', task_id=task.id) }}" method="POST" id="edit-task-form">
+            
+            <!-- Поле: Название -->
+            <div class="mb-3">
+                <label for="title" class="form-label small fw-semibold text-secondary">Название задачи</label>
+                <input type="text" class="form-control form-control-custom fw-semibold" id="title" name="title" 
+                       value="{{ task.title }}" minlength="3" maxlength="50" required autocomplete="off">
+            </div>
+
+            <!-- Поле: Описание -->
+            <div class="mb-3">
+                <label for="description" class="form-label small fw-semibold text-secondary">Подробное описание</label>
+                <textarea class="form-control form-control-custom" id="description" name="description" 
+                          rows="4" maxlength="250" placeholder="Дополнительные детали отсутствуют...">{{ task.description or '' }}</textarea>
+            </div>
+
+            <!-- Параметры: Срок и Приоритет -->
+            <div class="row g-3 mb-4">
+                
+                <!-- Дата выполнения -->
+                <div class="col-sm-6">
+                    <label for="deadline" class="form-label small fw-semibold text-secondary">
+                        <i class="fa-regular fa-calendar me-1"></i> Срок выполнения
+                    </label>
+                    <input type="date" class="form-control form-control-custom" id="deadline" name="deadline" 
+                           value="{{ task.deadline.strftime('%Y-%m-%d') if task.deadline else '' }}">
+                </div>
+
+                <!-- Приоритет -->
+                <div class="col-sm-6">
+                    <label for="priority" class="form-label small fw-semibold text-secondary">
+                        <i class="fa-solid fa-layer-group me-1"></i> Приоритет
+                    </label>
+                    <select class="form-select form-select-custom" id="priority" name="priority">
+                        <option value="low" {% if task.priority == 'low' %}selected{% endif %}>Низкий</option>
+                        <option value="medium" {% if task.priority == 'medium' %}selected{% endif %}>Средний</option>
+                        <option value="high" {% if task.priority == 'high' %}selected{% endif %}>Высокий 🔥</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- Зона системной информации (Даты создания/обновления) -->
+            <div class="meta-info-zone p-3 mb-4 small text-muted">
+                <div class="d-flex justify-content-between mb-1">
+                    <span><i class="fa-regular fa-clock me-1"></i> Создана:</span>
+                    <span class="fw-medium text-dark">{{ task.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span><i class="fa-solid fa-rotate me-1"></i> Обновлена:</span>
+                    <span class="fw-medium text-dark">{{ task.updated_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                </div>
+            </div>
+
+            <!-- Кнопки отправки и удаления -->
+            <div class="d-flex justify-content-between gap-2">
+                <!-- Кнопка удаления таска -->
+                <button type="button" class="btn btn-outline-danger px-3 rounded-3" 
+                        onclick="if(confirm('Вы уверены, что хотите окончательно удалить эту задачу?')) { document.getElementById('delete-form').submit(); }">
+                    <i class="fa-regular fa-trash-can"></i>
+                </button>
+
+                <!-- Основные действия -->
+                <div class="d-flex gap-2 flex-grow-1 justify-content-end">
+                    <a href="{{ url_for('tasks_list') }}" class="btn btn-light rounded-3 px-4 fw-medium text-secondary d-flex align-items-center">
+                        Отмена
+                    </a>
+                    <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold shadow-sm">
+                        Сохранить изменения
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Невидимая форма для удаления задачи -->
+        <form id="delete-form" action="{{ url_for('delete_task', task_id=task.id) }}" method="POST" style="display: none;"></form>
+
+    </div>
+</div>
+
+<!-- Браузерная микро-валидация даты перед отправкой -->
+<script>
+    document.getElementById('edit-task-form').addEventListener('submit', function(e) {
+        const deadlineInput = document.getElementById('deadline').value;
+        if (deadlineInput) {
+            const selectedDate = new Date(deadlineInput);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            if (selectedDate < today) {
+                e.preventDefault();
+                alert('Срок выполнения не может быть в прошлом!');
+            }
+        }
+    });
+</script>
+{% endblock maincontent %}
