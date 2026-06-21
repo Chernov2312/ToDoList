@@ -1,7 +1,7 @@
 __all__ = ()
 from typing import Optional
 
-from fastapi import APIRouter, Cookie, Depends, Form, Request, status
+from fastapi import APIRouter, Cookie, Depends, Form, Request, Response, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import ValidationError
 
@@ -9,8 +9,8 @@ from config import Tags, templates
 from core.security import get_current_active_user
 from db.dao import TaskDAO
 from schemas.item import Task
-from schemas.verification import UserAuth
 from schemas.user import User
+from schemas.verification import UserAuth
 
 catalog_router = APIRouter(tags=[Tags.catalog])
 
@@ -19,9 +19,9 @@ catalog_router = APIRouter(tags=[Tags.catalog])
 async def task_info(
     request: Request,
     task: Task,
-    _: UserAuth = Depends(get_current_active_user),
+    user: UserAuth = Depends(get_current_active_user),
 ):
-    context = {'Задание': task}
+    context = {'Задание': task, 'user': user}
     return templates.TemplateResponse(
         request=request,
         name='todo/item_info.html',
@@ -40,6 +40,7 @@ async def task_list(
     context = {
         'tasks': tasks,
         'delete': delete == 'true',
+        'user': user,
     }
     return templates.TemplateResponse(
         request=request,
@@ -52,7 +53,7 @@ async def task_list(
 async def create_task_page(
     request: Request,
     created: Optional[str] = Cookie(None, alias='created_task'),
-    _: UserAuth = Depends(get_current_active_user),
+    user: UserAuth = Depends(get_current_active_user),
 ):
     return templates.TemplateResponse(
         request=request,
@@ -61,18 +62,19 @@ async def create_task_page(
             'form_data': {},
             'errors': {},
             'created': created == 'true',
+            'user': user,
         },
     )
 
 
-@catalog_router.post('/v1/create_task', response_class=HTMLResponse)
+@catalog_router.post('/v1/create_task')
 async def create_task(
     request: Request,
     title: str = Form(...),
     description: str = Form(...),
     deadline: str = Form(...),
     user: UserAuth = Depends(get_current_active_user),
-):
+) -> Response:
     form_data = {
         'title': title,
         'description': description,
@@ -93,6 +95,7 @@ async def create_task(
             context={
                 'form_data': form_data,
                 'errors': errors,
+                'user': user,
             },
             status_code=status.HTTP_400_BAD_REQUEST,
         )
@@ -113,7 +116,7 @@ async def create_task(
 async def delete_task(
     task_id: str = Form(...),
     _: UserAuth = Depends(get_current_active_user),
-):
+) -> RedirectResponse:
     await TaskDAO.delete(task_id)
     response = RedirectResponse(
         url='todo/v1/tasks',

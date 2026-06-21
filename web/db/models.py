@@ -13,7 +13,9 @@ class User(Base):
     password: Mapped[str] = mapped_column(String(250), nullable=False)
     email: Mapped[str] = mapped_column(String(250), nullable=False)
     disabled: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=False,
+        Boolean,
+        nullable=False,
+        default=False,
     )
     tasks: Mapped[list['Task']] = relationship(
         'Task',

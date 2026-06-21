@@ -2,7 +2,7 @@ __all__ = ()
 from datetime import timedelta
 from typing import Optional
 
-from fastapi import APIRouter, Cookie, Form, Request, status
+from fastapi import APIRouter, Cookie, Form, Request, Response, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError
@@ -14,7 +14,6 @@ from core.security import (
     get_password_hash,
 )
 from db.dao import UserDAO
-from schemas.verification import UserAuth
 from schemas.user import User
 
 auth_router = APIRouter(tags=[Tags.auth])
@@ -32,13 +31,13 @@ async def register_page(request: Request):
     )
 
 
-@auth_router.post('/register', response_class=HTMLResponse)
+@auth_router.post('/register')
 async def register_user(
     request: Request,
     username: str = Form(...),
     email: str = Form(...),
     password: str = Form(...),
-):
+) -> Response:
     form_data = {'username': username, 'email': email, 'password': password}
     errors = {}
     try:
@@ -57,7 +56,6 @@ async def register_user(
                 await UserDAO.add(form_data)
             except IntegrityError as e:
                 error_msg = str(e).lower()
-                print(e)
                 if 'email' in error_msg and 'duplicate key' in error_msg:
                     errors['email'] = (
                         'Эта электронная почта уже зарегистрирована'
@@ -72,7 +70,6 @@ async def register_user(
             errors['username'] = 'Это имя пользователя уже занято'
 
     if errors:
-        print(errors)
         return templates.TemplateResponse(
             request=request,
             name='auth/register.html',
@@ -98,6 +95,7 @@ async def register_user(
 async def login_page(
     request: Request,
     registered: Optional[str] = Cookie(None, alias='registered'),
+    flash_message: Optional[str] = Cookie(None, alias='flash_message'),
 ):
     registered = registered == 'true'
     response = templates.TemplateResponse(
@@ -107,17 +105,18 @@ async def login_page(
             'form_data': {},
             'errors': {},
             'registered': registered,
+            'flash_message': flash_message,
         },
     )
     return response
 
 
-@auth_router.post('/login', response_class=HTMLResponse)
+@auth_router.post('/login')
 async def login_user(
     request: Request,
     username: str = Form(...),
     password: str = Form(...),
-):
+) -> Response:
     user = await authenticate_user(username, password)
 
     if not user:

@@ -10,8 +10,8 @@ from pwdlib import PasswordHash
 
 from config import settings
 from db.dao import UserDAO
-from schemas.verification import TokenData, UserAuth
 from schemas.user import User
+from schemas.verification import TokenData, UserAuth
 
 password_hash = PasswordHash.recommended()
 

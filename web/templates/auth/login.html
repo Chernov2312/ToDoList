@@ -92,7 +92,14 @@
                     <!-- Заголовок -->
                     <h1 class="card-title text-center mb-2">Добро пожаловать</h1>
                     <p class="card-subtitle text-center mb-4">Войдите в свой аккаунт</p>
-
+                    {% if flash_message %}
+                        <div class="alert alert-warning border-0 rounded-3 shadow-sm mb-4 d-flex align-items-center" role="alert">
+                            <i class="fa-solid fa-circle-exclamation fs-5 timetable-icon me-2 text-warning"></i>
+                            <div class="small fw-medium text-secondary">
+                                {{ flash_message }}
+                            </div>
+                        </div>
+                    {% endif %}
                     <!-- Flash-сообщение об успешной регистрации -->
                     {% if registered %}
                         <div class="alert-success text-center">

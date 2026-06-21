@@ -1,8 +1,151 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}Главная страница{% endblock %}
+{% block title %}Главная | ToDO — Управляйте задачами эффективно{% endblock title %}
+
+{% block head %}
+<!-- Подключение FontAwesome для иконок преимуществ -->
+<link rel="stylesheet" href="https://cloudflare.com">
+<style>
+    /* Стили для главного баннера (Hero Section) */
+    .hero-section {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        padding: 6rem 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .feature-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid #e2e8f0;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.05) !important;
+    }
+
+    .icon-box {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 1rem;
+    }
+</style>
+{% endblock head %}
+
 {% block maincontent %}
-  <div class="container">
-    <p>Вы на главной</p>
-  </div>
-{% endblock %}
+<!-- Главный баннер (Hero Section) -->
+<section class="hero-section d-flex align-items-center">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 text-center text-lg-start">
+                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-semibold mb-3 small">
+                    🔥 Ваша продуктивность на максимум
+                </span>
+                <h1 class="display-4 fw-black text-dark mb-3 lh-sm">
+                    Организуйте свои дела <br>вместе с <span class="text-primary fw-bold">ToDO</span>
+                </h1>
+                <p class="lead text-muted mb-4" style="max-width: 500px;">
+                    Простой, быстрый и современный инструмент для планирования ежедневных задач, дедлайнов и достижения ваших целей. 
+                </p>
+                <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
+                    <a href="{{ url_for('register_user') }}" class="btn btn-primary btn-lg px-4 py-3 fw-semibold shadow-sm rounded-3">
+                        Начать бесплатно
+                    </a>
+                    <a href="{{ url_for('login_page') }}" class="btn btn-outline-secondary btn-lg px-4 py-3 fw-medium rounded-3">
+                        Уже есть аккаунт
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block text-center">
+                <!-- Минималистичная векторная имитация интерфейса вместо тяжелой картинки -->
+                <div class="bg-white p-4 rounded-4 shadow-lg border border-light-subtle text-start mx-auto" style="max-width: 460px;">
+                    <div class="d-flex align-items-center mb-3 border-bottom pb-2">
+                        <div class="bg-success rounded-circle me-2" style="width: 12px; height: 12px;"></div>
+                        <div class="bg-warning rounded-circle me-2" style="width: 12px; height: 12px;"></div>
+                        <div class="bg-danger rounded-circle" style="width: 12px; height: 12px;"></div>
+                        <span class="text-muted small ms-3 fw-medium">my_tasks_list.html</span>
+                    </div>
+                    <div class="p-2 mb-2 bg-light rounded-3 d-flex align-items-center justify-content-between border-start border-primary border-4">
+                        <span class="small fw-semibold text-dark"><i class="fa-regular fa-square me-2 text-muted"></i> Купить продукты</span>
+                        <span class="badge bg-success bg-opacity-10 text-success small">Низкий</span>
+                    </div>
+                    <div class="p-2 mb-2 bg-light rounded-3 d-flex align-items-center justify-content-between border-start border-warning border-4">
+                        <span class="small fw-semibold text-dark"><i class="fa-regular fa-square me-2 text-muted"></i> Подготовить отчет по работе</span>
+                        <span class="badge bg-warning bg-opacity-10 text-warning small">Средний</span>
+                    </div>
+                    <div class="p-2 bg-light rounded-3 d-flex align-items-center justify-content-between border-start border-danger border-4 opacity-50">
+                        <span class="small text-decoration-line-through text-muted"><i class="fa-regular fa-square-check me-2 text-success"></i> Закодить бэкенд на FastAPI</span>
+                        <span class="badge bg-danger bg-opacity-10 text-danger small">Высокий 🔥</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Блок преимуществ (Features Section) -->
+<section class="py-5 my-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-dark mb-2">Почему именно ToDO?</h2>
+            <p class="text-muted small">Всё необходимое для эффективного тайм-менеджмента</p>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Преимущество 1 -->
+            <div class="col-md-4">
+                <div class="card h-100 feature-card p-4 rounded-4 shadow-sm">
+                    <div class="icon-box bg-primary bg-opacity-10 text-primary mb-3">
+                        <i class="fa-solid fa-bolt fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Молниеносная скорость</h5>
+                    <p class="text-muted small mb-0">
+                        Асинхронный бэкенд на базе FastAPI и SQLAlchemy гарантирует моментальный отклик интерфейса без задержек.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Преимущество 2 -->
+            <div class="col-md-4">
+                <div class="card h-100 feature-card p-4 rounded-4 shadow-sm">
+                    <div class="icon-box bg-warning bg-opacity-10 text-warning mb-3">
+                        <i class="fa-regular fa-calendar-check fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Умные дедлайны</h5>
+                    <p class="text-muted small mb-0">
+                        Устанавливайте сроки выполнения и распределяйте приоритеты задач. Вы больше никогда не пропустите важную встречу или релиз.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Преимущество 3 -->
+            <div class="col-md-4">
+                <div class="card h-100 feature-card p-4 rounded-4 shadow-sm">
+                    <div class="icon-box bg-success bg-opacity-10 text-success mb-3">
+                        <i class="fa-solid fa-shield-halved fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Полная безопасность</h5>
+                    <p class="text-muted small mb-0">
+                        Ваши пароли надежно защищены современным алгоритмом хеширования Argon2, а сессии изолированы с помощью безопасных JWT-токенов в Cookies.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Блок призыва к действию (CTA Section) -->
+<section class="py-5 bg-dark text-white rounded-4 container mb-5 shadow-sm text-center">
+    <div class="py-4">
+        <h2 class="fw-bold mb-3">Готовы навести порядок в своих делах?</h2>
+        <p class="text-white-50 mb-4 small" style="max-width: 500px; margin: 0 auto;">
+            Создайте личный аккаунт за 10 секунд и начните контролировать свой рабочий процесс уже сегодня. Без скрытых платежей.
+        </p>
+        <a href="{{ url_for('register_user') }}" class="btn btn-primary btn-lg px-5 py-3 fw-semibold rounded-3 shadow-sm">
+            Зарегистрироваться сейчас
+        </a>
+    </div>
+</section>
+{% endblock maincontent %}
