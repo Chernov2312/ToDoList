@@ -12,7 +12,9 @@ homepage_router = APIRouter(tags=[Tags.homepage])
     description='Главная страница',
     response_class=HTMLResponse,
 )
-async def homepage(request: Request):
+async def homepage(
+    request: Request,
+):
     return templates.TemplateResponse(
         request=request,
         name='homepage/home.html',

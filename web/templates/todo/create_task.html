@@ -1,35 +1,123 @@
-<div class="card border-0 shadow-sm rounded-4 mb-4">
-    <div class="card-body p-4">
+{% extends 'base.html' %}
+
+{% block title %}Новая задача | ToDO{% endblock title %}
+
+{% block head %}
+<!-- Подключение FontAwesome для иконок -->
+<link rel="stylesheet" href="https://cloudflare.com">
+<style>
+    :root {
+        --panel-bg: #ffffff;
+        --input-bg: #f8fafc;
+        --border-color: #e2e8f0;
+        --text-muted: #64748b;
+        --focus-ring: 0 0 0 4px rgba(13, 110, 253, 0.15);
+    }
+
+    .task-create-wrapper {
+        min-height: calc(100vh - 160px); /* Вычитаем примерную высоту header и footer */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        background-color: #f1f5f9;
+    }
+
+    .task-create-card {
+        width: 100%;
+        max-width: 580px;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 2.5rem;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-control-custom, .form-select-custom {
+        background-color: var(--input-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+    }
+
+    .form-control-custom:focus, .form-select-custom:focus {
+        background-color: #ffffff;
+        border-color: #0d6efd;
+        box-shadow: var(--focus-ring);
+        outline: none;
+    }
+
+    /* Мягкая подсветка ошибок */
+    .form-control-custom.is-invalid, .form-select-custom.is-invalid {
+        border-color: #dc3545 !important;
+        background-color: #fff8f8;
+    }
+</style>
+{% endblock head %}
+
+{% block maincontent %}
+<div class="task-create-wrapper">
+    <div class="task-create-card">
         
-        {% if created %}
-            <div class="alert-success text-center">
-                <i class="bi bi-check-circle-fill me-2"></i>
-                    Задание было успешно добавлено
-            </div>
-        {% endif %}
-        <div class="d-flex align-items-center mb-3">
-            <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-2 me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                <i class="fa-solid fa-plus fs-5"></i>
+        <!-- Кнопка возврата назад -->
+        <div class="mb-4">
+            <a href="/todo/v1/tasks" class="btn btn-link text-decoration-none text-secondary p-0 small fw-semibold">
+                <i class="fa-solid fa-arrow-left me-1"></i> Вернуться к списку
+            </a>
+        </div>
+
+        <!-- Заголовок карточки -->
+        <div class="d-flex align-items-center mb-4">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-2 me-3 d-flex align-items-center justify-content-center" style="width: 46px; height: 46px;">
+                <i class="fa-solid fa-plus fs-4"></i>
             </div>
             <div>
-                <h5 class="card-title fw-bold text-dark mb-0">Новая задача</h5>
+                <h5 class="card-title fw-bold text-dark mb-1 fs-4">Создать задачу</h5>
                 <p class="text-muted small mb-0">Что планируете сделать сегодня?</p>
             </div>
         </div>
 
+        <!-- Вывод общей критической ошибки бэкенда (если есть) -->
+        {% if errors and errors.main %}
+        <div class="alert alert-danger border-0 rounded-3 shadow-sm mb-4 small" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errors.main }}
+        </div>
+        {% endif %}
+
         <!-- Форма создания таска -->
-        <form action="{{ url_for('create_task') }}" method="POST">
+        <form action="{{ url_for('create_task') }}" method="POST" id="create-task-form">
             
             <!-- Поле: Название задачи -->
             <div class="mb-3">
-                <input type="text" class="form-control form-control-lg border-light-subtle rounded-3 bg-light bg-opacity-50" 
-                       id="task_title" name="title" placeholder="Например: Купить молоко или Закодить форму" required autocomplete="off">
+                <label for="task_title" class="form-label small fw-semibold text-secondary">Название задачи</label>
+                <input type="text" 
+                       class="form-control form-control-custom form-control-lg fw-semibold {% if errors and errors.title %}is-invalid{% endif %}" 
+                       id="task_title" 
+                       name="title" 
+                       placeholder="Например: Купить молоко или Закодить форму" 
+                       value="{{ form_data.title or '' if form_data else '' }}" 
+                       minlength="3" 
+                       maxlength="50" 
+                       required 
+                       autocomplete="off">
+                {% if errors and errors.title %}
+                <div class="text-danger small mt-1 ps-1">{{ errors.title }}</div>
+                {% endif %}
             </div>
 
             <!-- Поле: Описание задачи (необязательное) -->
             <div class="mb-3">
-                <textarea class="form-control border-light-subtle rounded-3 bg-light bg-opacity-50" 
-                          id="task_description" name="description" rows="2" placeholder="Добавьте детали или заметки..."></textarea>
+                <label for="task_description" class="form-label small fw-semibold text-secondary">Подробное описание</label>
+                <textarea class="form-control form-control-custom {% if errors and errors.description %}is-invalid{% endif %}" 
+                          id="task_description" 
+                          name="description" 
+                          rows="4" 
+                          maxlength="250" 
+                          placeholder="Добавьте детали или заметки...">{{ form_data.description or '' if form_data else '' }}</textarea>
+                {% if errors and errors.description %}
+                <div class="text-danger small mt-1 ps-1">{{ errors.description }}</div>
+                {% endif %}
             </div>
 
             <!-- Дополнительные параметры: Дедлайн и Приоритет -->
@@ -40,8 +128,15 @@
                     <label for="task_due_date" class="form-label small fw-semibold text-secondary">
                         <i class="fa-regular fa-calendar me-1"></i> Срок выполнения
                     </label>
-                    <input type="date" class="form-control border-light-subtle rounded-3 bg-light bg-opacity-50" 
-                           id="task_due_date" name="due_date">
+                    <!-- Изменено: type="datetime-local" вместо type="date" -->
+                    <input type="datetime-local" 
+                        class="form-control form-control-custom {% if errors and errors.deadline %}is-invalid{% endif %}" 
+                        id="task_due_date" 
+                        name="deadline"
+                        value="{{ form_data.deadline or '' if form_data else '' }}">
+                    {% if errors and errors.deadline %}
+                    <div class="text-danger small mt-1 ps-1">{{ errors.deadline }}</div>
+                    {% endif %}
                 </div>
 
                 <!-- Приоритет задачи -->
@@ -49,20 +144,20 @@
                     <label for="task_priority" class="form-label small fw-semibold text-secondary">
                         <i class="fa-solid fa-layer-group me-1"></i> Приоритет
                     </label>
-                    <select class="form-select border-light-subtle rounded-3 bg-light bg-opacity-50" id="task_priority" name="priority">
-                        <option value="low" selected>Низкий</option>
-                        <option value="medium">Средний</option>
-                        <option value="high">Высокий 🔥</option>
+                    <select class="form-select form-select-custom" id="task_priority" name="priority">
+                        <option value="low" {% if form_data and form_data.priority == 'low' %}selected{% endif %}>Низкий</option>
+                        <option value="medium" {% if not form_data or form_data.priority == 'medium' %}selected{% endif %}>Средний</option>
+                        <option value="high" {% if form_data and form_data.priority == 'high' %}selected{% endif %}>Высокий 🔥</option>
                     </select>
                 </div>
 
             </div>
 
             <!-- Кнопки управления -->
-            <div class="d-flex justify-content-end gap-2">
-                <button type="reset" class="btn btn-light rounded-3 px-4 fw-medium text-secondary">
-                    Очистить
-                </button>
+            <div class="d-flex justify-content-end gap-2 pt-2 border-top border-light-subtle">
+                <a href="/todo/v1/tasks" class="btn btn-light rounded-3 px-4 fw-medium text-secondary d-flex align-items-center">
+                    Отмена
+                </a>
                 <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold shadow-sm">
                     Создать задачу
                 </button>
@@ -73,12 +168,18 @@
     </div>
 </div>
 
-<style>
-    /* Легкий фокус-эффект для полей ввода в карточке */
-    .card .form-control:focus, 
-    .card .form-select:focus {
-        background-color: #ffffff !important;
-        border-color: #0d6efd !important;
-        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15) !important;
-    }
-</style>
+<script>
+    document.getElementById('create-task-form').addEventListener('submit', function(e) {
+        const deadlineInput = document.getElementById('task_due_date').value;
+        if (deadlineInput) {
+            const selectedDate = new Date(deadlineInput);
+            const now = new Date();
+            
+            if (selectedDate < now) {
+                e.preventDefault();
+                alert('Срок выполнения не может быть в прошлом!');
+            }
+        }
+    });
+</script>
+{% endblock maincontent %}

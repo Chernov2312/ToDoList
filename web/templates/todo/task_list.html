@@ -3,6 +3,7 @@
 {% block title %}Мои задачи | ToDO{% endblock title %}
 
 {% block head %}
+<!-- Подключение иконок FontAwesome -->
 <link rel="stylesheet" href="https://cloudflare.com">
 <style>
     /* Эффект зачеркивания и размытия для выполненных задач */
@@ -27,6 +28,16 @@
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05) !important;
     }
 
+    /* Стили для текстовой области-ссылки */
+    .task-link-area {
+        display: block;
+        color: inherit;
+        transition: opacity 0.2s ease;
+    }
+    .task-link-area:hover {
+        opacity: 0.85;
+    }
+
     /* Кастомный чекбокс-кружок */
     .task-checkbox {
         width: 1.4rem;
@@ -42,15 +53,13 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
             
-            <!-- Здесь можно подключить ранее созданную карточку добавления -->
-            {# {% include 'includes/create_task_card.html' %} #}
             {% if delete %}
-                <div class="alert-success text-center">
-                    <i class="bi bi-check-circle-fill me-2"></i>
-                        Задание было успешно удалено
+                <div class="alert alert-success border-0 rounded-3 shadow-sm mb-4 text-center small" role="alert">
+                    <i class="fa-solid fa-circle-check me-2 text-success"></i>
+                    Задание было успешно удалено
                 </div>
             {% endif %}
-            <!-- Заголовок списка -->
+
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4 class="fw-bold text-dark mb-0">
                     Список задач 
@@ -58,25 +67,23 @@
                         {{ tasks|length }}
                     </span>
                 </h4>
+                <a href="{{ url_for('create_task') }}" class="btn btn-primary btn-sm rounded-3 px-3 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Добавить задачу</span>
+                </a>
             </div>
 
-            <!-- Контейнер списка задач -->
             <div class="d-flex flex-column gap-3">
                 {% for task in tasks %}
-                    <!-- Карточка отдельной задачи -->
-                    <div class="card border-0 shadow-sm rounded-4 task-item {% if task.is_completed %}task-completed{% endif %}">
+                    <div class="card border-0 shadow-sm rounded-4 task-item {% if task.is_complete %}task-completed{% endif %}">
                         <div class="card-body p-4 d-flex align-items-start gap-3">
                             
-                            <!-- Чекбокс изменения статуса (выполнено / не выполнено) -->
-                            <form action="{{ url_for('toggle_task', task_id=task.id) }}" method="POST" class="m-0">
-                                <input class="form-check-input task-checkbox border-secondary-subtle" 
-                                       type="checkbox" 
-                                       onChange="this.form.submit()" 
-                                       {% if task.is_completed %}checked{% endif %}>
+                            <form action="{{ url_for('toggle_task') }}" method="POST" class="m-0">
+                                <input type="hidden" name="task_id" value="{{ task.id }}">
+                                <input class="form-check-input task-checkbox" type="checkbox" onChange="this.form.submit()" {% if task.is_complete %}checked{% endif %}>
                             </form>
 
-                            <!-- Текстовое содержимое задачи -->
-                            <div class="flex-grow-1 min-w-0">
+                            <a href="{{ url_for('task_info', task_id=task.id) }}" class="flex-grow-1 min-w-0 text-decoration-none task-link-area">
                                 <h6 class="fw-bold text-dark mb-1 task-title text-wrap text-break">
                                     {{ task.title }}
                                 </h6>
@@ -86,18 +93,17 @@
                                     </p>
                                 {% endif %}
 
-                                <!-- Метаданные: Дедлайн и Приоритет -->
                                 <div class="d-flex flex-wrap gap-2 align-items-center mt-2">
                                     
-                                    <!-- Отображение дедлайна -->
-                                    {% if task.due_date %}
-                                        <span class="badge bg-light text-secondary border border-light-subtle rounded-3 px-2 py-1.5 small fw-medium">
+                                    {% if task.deadline %}
+                                        <span class="badge bg-light text-secondary border border-light-subtle rounded-3 px-2 py-1.5 small fw-medium js-deadline-badge" 
+                                            data-deadline="{{ task.deadline.isoformat() }}" 
+                                            data-complete="{{ 'true' if task.is_complete else 'false' }}">
                                             <i class="fa-regular fa-calendar me-1"></i> 
-                                            {{ task.due_date }}
+                                            <span class="deadline-text">Загрузка...</span>
                                         </span>
                                     {% endif %}
 
-                                    <!-- Отображение приоритета динамическим цветом -->
                                     {% if task.priority == 'high' %}
                                         <span class="badge bg-danger bg-opacity-10 text-danger rounded-3 px-2 py-1.5 small fw-semibold">Высокий 🔥</span>
                                     {% elif task.priority == 'medium' %}
@@ -107,11 +113,12 @@
                                     {% endif %}
 
                                 </div>
-                            </div>
+                            </a>
 
-                            <!-- Кнопка удаления задачи -->
                             <div class="d-flex align-self-center">
                                 <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST" class="m-0">
+                                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                                    
                                     <button type="submit" class="btn btn-link text-danger p-2 rounded-3 hover-bg-danger-subtle" 
                                             onclick="return confirm('Вы уверены, что хотите удалить эту задачу?')"
                                             style="transition: background-color 0.2s;">
@@ -123,13 +130,12 @@
                         </div>
                     </div>
                 {% else %}
-                    <!-- Состояние, если задач еще нет -->
                     <div class="text-center py-5 bg-white rounded-4 border border-dashed border-secondary border-opacity-25 shadow-sm">
                         <div class="text-muted mb-3">
                             <i class="fa-regular fa-folder-open display-4 opacity-50"></i>
                         </div>
                         <h5 class="fw-bold text-secondary mb-1">Задач пока нет</h5>
-                        <p class="text-muted small mb-0">Создайте свою первую задачу, используя форму выше!</p>
+                        <p class="text-muted small mb-0">Создайте свою первую задачу, нажав кнопку выше!</p>
                     </div>
                 {% endfor %}
             </div>
@@ -137,4 +143,51 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Получаем текущее время устройства пользователя
+        const userNow = new Date();
+
+        // Находим все бейджи дедлайнов на странице
+        document.querySelectorAll('.js-deadline-badge').forEach(badge => {
+            const deadlineStr = badge.getAttribute('data-deadline');
+            const isComplete = badge.getAttribute('data-complete') === 'true';
+            const textNode = badge.querySelector('.deadline-text');
+            
+            if (!deadlineStr) return;
+
+            // Превращаем строку ISO из базы данных в объект даты (браузер автоматически учтет локальную зону)
+            const deadlineDate = new Date(deadlineStr);
+
+            // Форматируем дату под язык пользователя (например: 14.08.2026, 20:39)
+            const formattedDate = deadlineDate.toLocaleString(navigator.language, {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            if (isComplete) {
+                // Если задача выполнена, просто пишем дату
+                textNode.textContent = formattedDate;
+            } else if (deadlineDate < userNow) {
+                // Если просрочена на устройстве пользователя: меняем классы Bootstrap на красный цвет
+                badge.classList.remove('bg-light', 'text-secondary', 'border-light-subtle');
+                badge.classList.add('bg-danger', 'bg-opacity-10', 'text-danger', 'border-danger-subtle', 'fw-semibold');
+                
+                // Меняем иконку на восклицательный знак
+                const icon = badge.querySelector('i');
+                if (icon) {
+                    icon.className = 'fa-solid fa-circle-exclamation me-1';
+                }
+
+                textNode.textContent = `Просрочено: ${formattedDate}`;
+            } else {
+                textNode.textContent = formattedDate;
+            }
+        });
+    });
+</script>
 {% endblock maincontent %}

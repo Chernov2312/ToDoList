@@ -1,4 +1,6 @@
 __all__ = ()
+from datetime import datetime
+from uuid import UUID
 from typing import Optional
 
 from fastapi import APIRouter, Cookie, Depends, Form, Request, Response, status
@@ -8,25 +10,11 @@ from pydantic import ValidationError
 from config import Tags, templates
 from core.security import get_current_active_user
 from db.dao import TaskDAO
-from schemas.item import Task
+from schemas.item import Task, TaskEdit
 from schemas.user import User
 from schemas.verification import UserAuth
 
 catalog_router = APIRouter(tags=[Tags.catalog])
-
-
-@catalog_router.get('/v1/task_info', response_class=HTMLResponse)
-async def task_info(
-    request: Request,
-    task: Task,
-    user: UserAuth = Depends(get_current_active_user),
-):
-    context = {'Задание': task, 'user': user}
-    return templates.TemplateResponse(
-        request=request,
-        name='todo/item_info.html',
-        context=context,
-    )
 
 
 @catalog_router.get('/v1/tasks', response_class=HTMLResponse)
@@ -44,7 +32,7 @@ async def task_list(
     }
     return templates.TemplateResponse(
         request=request,
-        name='todo/task_list.html',
+        name='/todo/task_list.html',
         context=context,
     )
 
@@ -73,12 +61,14 @@ async def create_task(
     title: str = Form(...),
     description: str = Form(...),
     deadline: str = Form(...),
+    priority: str = Form(...),
     user: UserAuth = Depends(get_current_active_user),
 ) -> Response:
     form_data = {
         'title': title,
         'description': description,
         'deadline': deadline,
+        'priority': priority,
         'user_id': user.id,
     }
     errors = {}
@@ -91,7 +81,7 @@ async def create_task(
     if errors:
         return templates.TemplateResponse(
             request=request,
-            name='todo/create_task.html',
+            name='/todo/create_task.html',
             context={
                 'form_data': form_data,
                 'errors': errors,
@@ -99,9 +89,9 @@ async def create_task(
             },
             status_code=status.HTTP_400_BAD_REQUEST,
         )
-    await TaskDAO.add(form_data)
+    await TaskDAO.add(Task(**form_data).model_dump(mode='python'))
     response = RedirectResponse(
-        url='todo/v1/create_task',
+        url='/todo/v1/create_task',
         status_code=status.HTTP_303_SEE_OTHER,
     )
     response.set_cookie(
@@ -112,14 +102,66 @@ async def create_task(
     return response
 
 
-@catalog_router.post('/v1/delete')
-async def delete_task(
-    task_id: str = Form(...),
+@catalog_router.post('/v1/complete', name='toggle_task')
+async def toggle_task(
+    task_id: UUID = Form(...),
     _: UserAuth = Depends(get_current_active_user),
 ) -> RedirectResponse:
-    await TaskDAO.delete(task_id)
+    await TaskDAO.toggle_complete(task_id)
     response = RedirectResponse(
-        url='todo/v1/tasks',
+        url='/todo/v1/tasks',
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+    res = await TaskDAO.get_by_id(task_id)
+    print(res.is_complete)
+    return response
+
+
+@catalog_router.get('/v1/task_info/{task_id}', response_class=HTMLResponse)
+async def task_info(
+    request: Request,
+    task_id: UUID,
+    user: UserAuth = Depends(get_current_active_user),
+):
+    return templates.TemplateResponse(
+        request=request,
+        name='/todo/task_info.html',
+        context={
+            'task': await TaskDAO.get_by_id(task_id),
+            'user': user,
+        },
+    )
+
+
+@catalog_router.post('/v1/edit/{task_id}', name='edit_task')
+async def edit_task(
+    task_id: UUID,
+    title: str = Form(...),
+    description: str = Form(None),
+    deadline: datetime = Form(...),
+    priority: str = Form(...),
+    _: UserAuth = Depends(get_current_active_user),
+) -> RedirectResponse:
+    task = TaskEdit(
+        **{
+            'title': title,
+            'description': description,
+            'deadline': deadline,
+            'priority': priority,
+        },
+    )
+    await TaskDAO.edit(task_id, task.model_dump(mode='python'))
+    return RedirectResponse(url='/todo/v1/tasks', status_code=status.HTTP_303_SEE_OTHER)
+
+
+@catalog_router.post('/v1/delete_task/{task_id}', name='delete_task')
+async def delete_task(
+    task_id: UUID,
+    _: UserAuth = Depends(get_current_active_user),
+) -> RedirectResponse:
+    await TaskDAO.delete_by_id(task_id)
+    response = RedirectResponse(
+        url='/todo/v1/tasks',
         status_code=status.HTTP_303_SEE_OTHER,
     )
     response.set_cookie(

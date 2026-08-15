@@ -2,7 +2,7 @@ __all__ = ()
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, Date, ForeignKey, String
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, BOOLEAN
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.database import Base
@@ -35,4 +35,6 @@ class Task(Base):
     )
     title: Mapped[str] = mapped_column(String(50), nullable=False)
     description: Mapped[str] = mapped_column(String(500), nullable=False)
-    deadline: Mapped[datetime] = mapped_column(Date, nullable=True)
+    deadline: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    priority: Mapped[str] = mapped_column(String(10), nullable=False, default='Low')
+    is_complete: Mapped[bool] = mapped_column(BOOLEAN, default=False)

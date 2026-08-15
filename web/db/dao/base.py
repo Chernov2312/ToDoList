@@ -2,6 +2,7 @@ __all__ = ()
 import uuid
 from typing import Any, Dict, List
 
+from sqlalchemy import select, delete, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -40,6 +41,27 @@ class BaseDAO:
         return new_instances
 
     @classmethod
-    async def get_by_id(cls, session: AsyncSession, id: uuid.UUID):
-        item = session.get(cls.model, id)
-        return item
+    @connection
+    async def get_by_id(cls, cur_id: uuid.UUID, *, session: AsyncSession):
+        query = select(cls.model).filter_by(id=cur_id)
+        result = await session.execute(query)
+        return result.scalar_one_or_none()
+
+    @classmethod
+    @connection
+    async def delete_by_id(cls, cur_id: uuid.UUID, *, session: AsyncSession):
+        query = delete(cls.model).filter_by(id=cur_id)
+        result = await session.execute(query)
+        return result.rowcount
+
+    @classmethod
+    @connection
+    async def edit(cls, cur_id: uuid.UUID, data: dict, *, session: AsyncSession):
+        stmt = update(cls.model).where(cls.model.id == cur_id).values(**data)
+        result = await session.execute(stmt)
+        try:
+            await session.commit()
+        except SQLAlchemyError as e:
+            await session.rollback()
+            raise e
+        return result.rowcount > 0

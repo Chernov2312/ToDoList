@@ -8,9 +8,10 @@ from fastapi.responses import RedirectResponse
 
 def setup_exception_handlers(app: FastAPI) -> None:
 
-    @app.exception_handler(401)
+    @app.exception_handler(status.HTTP_401_UNAUTHORIZED)
     async def custom_http_exception(
-        request: Request, exc: HTTPException,
+        request: Request,
+        exc: HTTPException,
     ):
         if exc.status_code == status.HTTP_401_UNAUTHORIZED:
             response = RedirectResponse(
@@ -32,8 +33,10 @@ def setup_exception_handlers(app: FastAPI) -> None:
 
         return await request.app.default_exception_handler(request, exc)
 
-    @app.exception_handler(404)
-    async def not_found_exception_handler(request: Request, exc: HTTPException):
+    @app.exception_handler(status.HTTP_404_NOT_FOUND)
+    async def not_found_exception_handler(
+        request: Request, exc: HTTPException,
+    ):
         if exc.status_code == status.HTTP_404_NOT_FOUND:
             return RedirectResponse(
                 url='/v1',

@@ -1,203 +1,175 @@
-<!-- templates/verification/login.html -->
 {% extends 'base.html' %}
 
-{% block title %}Вход - ToDO{% endblock title %}
+{% block title %}Вход в аккаунт | ToDO{% endblock title %}
 
 {% block head %}
+<!-- Подключение иконок FontAwesome -->
+<link rel="stylesheet" href="https://cloudflare.com">
 <style>
-    body {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
+    :root {
+        --panel-bg: #ffffff;
+        --input-bg: #f8fafc;
+        --border-color: #e2e8f0;
+        --text-muted: #64748b;
+        --focus-ring: 0 0 0 4px rgba(13, 110, 253, 0.15);
     }
-    .login-card {
-        border: none;
-        border-radius: 16px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        max-width: 420px;
-        margin: 0 auto;
+
+    .auth-wrapper {
+        min-height: calc(100vh - 160px); /* Вычитаем примерную высоту header и footer */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        background-color: #f1f5f9;
     }
-    .login-card .card-body {
-        padding: 48px 40px;
+
+    .auth-card {
+        width: 100%;
+        max-width: 440px;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 2.5rem;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
     }
-    .login-card .card-title {
-        font-size: 28px;
-        font-weight: 700;
-        color: #1a202c;
+
+    .input-group-custom {
+        position: relative;
     }
-    .login-card .card-subtitle {
-        color: #718096;
-        font-size: 16px;
+
+    .input-group-custom i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        z-index: 10;
+        transition: color 0.2s ease;
     }
+
+    .input-group-custom .form-control {
+        padding-left: 2.75rem;
+        background-color: var(--input-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        height: 3rem;
+        transition: all 0.2s ease;
+    }
+
+    .input-group-custom .form-control:focus {
+        background-color: #ffffff;
+        border-color: #0d6efd;
+        box-shadow: var(--focus-ring);
+    }
+
+    .input-group-custom .form-control:focus + i {
+        color: #0d6efd;
+    }
+
+    /* Мягкая подсветка ошибок */
+    .input-group-custom .is-invalid {
+        border-color: #dc3545 !important;
+        background-color: #fff8f8;
+    }
+    .input-group-custom .is-invalid + i {
+        color: #dc3545 !important;
+    }
+
     .btn-login {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        padding: 12px;
+        height: 3rem;
         font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    .btn-login:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-        background: linear-gradient(135deg, #5a67d8 0%, #6b46a1 100%);
-    }
-    .btn-login:active {
-        transform: translateY(0);
-    }
-    .form-control:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    }
-    .form-control.is-invalid:focus {
-        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-    }
-    .input-group-text {
-        background: #f8f9fa;
-        border-right: none;
-    }
-    .input-group .form-control {
-        border-left: none;
-    }
-    .input-group .form-control:focus {
-        border-left: none;
-    }
-    .register-link {
-        color: #718096;
-    }
-    .register-link a {
-        color: #667eea;
-        text-decoration: none;
-        font-weight: 600;
-    }
-    .register-link a:hover {
-        color: #5a67d8;
-        text-decoration: underline;
-    }
-    .alert-success {
-        background: #c6f6d5;
-        color: #22543d;
-        border: 1px solid #68d391;
-        border-radius: 10px;
-        padding: 12px 16px;
-        margin-bottom: 20px;
+        border-radius: 0.5rem;
     }
 </style>
 {% endblock head %}
 
 {% block maincontent %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-            <div class="card login-card">
-                <div class="card-body">
-                    <!-- Заголовок -->
-                    <h1 class="card-title text-center mb-2">Добро пожаловать</h1>
-                    <p class="card-subtitle text-center mb-4">Войдите в свой аккаунт</p>
-                    {% if flash_message %}
-                        <div class="alert alert-warning border-0 rounded-3 shadow-sm mb-4 d-flex align-items-center" role="alert">
-                            <i class="fa-solid fa-circle-exclamation fs-5 timetable-icon me-2 text-warning"></i>
-                            <div class="small fw-medium text-secondary">
-                                {{ flash_message }}
-                            </div>
-                        </div>
-                    {% endif %}
-                    <!-- Flash-сообщение об успешной регистрации -->
-                    {% if registered %}
-                        <div class="alert-success text-center">
-                            <i class="bi bi-check-circle-fill me-2"></i>
-                            Регистрация прошла успешно! Теперь войдите в систему.
-                        </div>
-                    {% endif %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        
+        <!-- Заголовок формы -->
+        <div class="text-center mb-4">
+            <h1 class="h3 fw-bold text-dark mb-2">Войти в ToDO</h1>
+            <p class="text-muted small">С возвращением! Введите свои данные для входа</p>
+        </div>
 
-                    <!-- Общая ошибка формы -->
-                    {% if errors and errors.get('__all__') %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ errors['__all__'] }}
-                        </div>
-                    {% endif %}
-
-                    <!-- Форма входа -->
-                    <form method="POST" action="{{ url_for('login_user') }}" novalidate>
-                        <!-- Поле Username -->
-                        <div class="mb-3">
-                            <label for="username" class="form-label fw-semibold">Имя пользователя</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-person"></i>
-                                </span>
-                                <input 
-                                    type="text" 
-                                    class="form-control {% if errors and errors.username %}is-invalid{% endif %}" 
-                                    id="username" 
-                                    name="username" 
-                                    placeholder="Введите имя пользователя"
-                                    value="{{ form_data.username if form_data else '' }}"
-                                    required
-                                    autofocus
-                                >
-                            </div>
-                            {% if errors and errors.username %}
-                                <div class="invalid-feedback d-block">
-                                    {{ errors.username }}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Поле Password -->
-                        <div class="mb-3">
-                            <label for="password" class="form-label fw-semibold">Пароль</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-lock"></i>
-                                </span>
-                                <input 
-                                    type="password" 
-                                    class="form-control {% if errors and errors.password %}is-invalid{% endif %}" 
-                                    id="password" 
-                                    name="password" 
-                                    placeholder="Введите пароль"
-                                    required
-                                >
-                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                            </div>
-                            {% if errors and errors.password %}
-                                <div class="invalid-feedback d-block">
-                                    {{ errors.password }}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Кнопка входа -->
-                        <button type="submit" class="btn btn-login text-white w-100 mt-2">
-                            <i class="bi bi-box-arrow-in-right me-2"></i>Войти
-                        </button>
-                    </form>
-
-                    <!-- Ссылка на регистрацию -->
-                    <div class="register-link text-center mt-4">
-                        Нет аккаунта? <a href="{{ url_for('register_page') }}">Зарегистрироваться</a>
-                    </div>
+        <!-- Flash-сообщение о необходимости войти -->
+        {% if flash_message %}
+            <div class="alert alert-warning border-0 rounded-3 shadow-sm mb-4 d-flex align-items-center" role="alert">
+                <i class="fa-solid fa-circle-exclamation fs-5 timetable-icon me-2 text-warning"></i>
+                <div class="small fw-medium text-secondary">
+                    {{ flash_message }}
                 </div>
             </div>
+        {% endif %}
+
+        <!-- Flash-сообщение об успешной регистрации -->
+        {% if registered %}
+            <div class="alert alert-success border-0 rounded-3 shadow-sm mb-4 d-flex align-items-center" role="alert">
+                <i class="fa-solid fa-circle-check fs-5 me-2 text-success"></i>
+                <div class="small fw-medium text-secondary">
+                    Регистрация прошла успешно! Теперь войдите в систему.
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Общая ошибка авторизации (Неверный пароль/логин) -->
+        {% if errors and errors.main %}
+            <div class="alert alert-danger border-0 rounded-3 shadow-sm mb-4 d-flex align-items-center" role="alert">
+                <i class="fa-solid fa-triangle-exclamation fs-5 me-2 text-danger"></i>
+                <div class="small fw-medium text-secondary">
+                    {{ errors.main }}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Форма авторизации -->
+        <form action="{{ url_for('login_user') }}" method="POST">
+            
+            <!-- Поле Username -->
+            <div class="mb-3">
+                <label for="username" class="form-label small fw-semibold text-secondary">Имя пользователя</label>
+                <div class="input-group-custom">
+                    <input type="text" 
+                           class="form-control {% if errors and errors.main %}is-invalid{% endif %}" 
+                           id="username" 
+                           name="username" 
+                           placeholder="john_doe" 
+                           value="{{ form_data.username or '' if form_data else '' }}" 
+                           required 
+                           autocomplete="username">
+                    <i class="fa-regular fa-user"></i>
+                </div>
+            </div>
+
+            <!-- Поле Password -->
+            <div class="mb-4">
+                <label for="password" class="form-label small fw-semibold text-secondary">Пароль</label>
+                <div class="input-group-custom">
+                    <input type="password" 
+                           class="form-control {% if errors and errors.main %}is-invalid{% endif %}" 
+                           id="password" 
+                           name="password" 
+                           placeholder="••••••••" 
+                           required 
+                           autocomplete="current-password">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+            </div>
+
+            <!-- Кнопка отправки -->
+            <button type="submit" class="btn btn-primary w-100 btn-login shadow-sm mb-3">
+                Войти в аккаунт
+            </button>
+        </form>
+
+        <!-- Ссылка на переход к регистрации -->
+        <div class="text-center pt-2">
+            <p class="small text-muted mb-0">
+                Ещё нет аккаунта? <a href="/auth/register" class="text-decoration-none fw-semibold">Зарегистрироваться</a>
+            </p>
         </div>
+
     </div>
 </div>
-
-<script>
-// Показать/скрыть пароль
-document.getElementById('togglePassword')?.addEventListener('click', function() {
-    const password = document.getElementById('password');
-    const icon = this.querySelector('i');
-    if (password.type === 'password') {
-        password.type = 'text';
-        icon.classList.remove('bi-eye');
-        icon.classList.add('bi-eye-slash');
-    } else {
-        password.type = 'password';
-        icon.classList.remove('bi-eye-slash');
-        icon.classList.add('bi-eye');
-    }
-});
-</script>
 {% endblock maincontent %}
