@@ -146,21 +146,14 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Получаем текущее время устройства пользователя
         const userNow = new Date();
-
-        // Находим все бейджи дедлайнов на странице
         document.querySelectorAll('.js-deadline-badge').forEach(badge => {
             const deadlineStr = badge.getAttribute('data-deadline');
             const isComplete = badge.getAttribute('data-complete') === 'true';
             const textNode = badge.querySelector('.deadline-text');
             
             if (!deadlineStr) return;
-
-            // Превращаем строку ISO из базы данных в объект даты (браузер автоматически учтет локальную зону)
             const deadlineDate = new Date(deadlineStr);
-
-            // Форматируем дату под язык пользователя (например: 14.08.2026, 20:39)
             const formattedDate = deadlineDate.toLocaleString(navigator.language, {
                 year: 'numeric',
                 month: '2-digit',
@@ -170,14 +163,10 @@
             });
 
             if (isComplete) {
-                // Если задача выполнена, просто пишем дату
                 textNode.textContent = formattedDate;
             } else if (deadlineDate < userNow) {
-                // Если просрочена на устройстве пользователя: меняем классы Bootstrap на красный цвет
                 badge.classList.remove('bg-light', 'text-secondary', 'border-light-subtle');
                 badge.classList.add('bg-danger', 'bg-opacity-10', 'text-danger', 'border-danger-subtle', 'fw-semibold');
-                
-                // Меняем иконку на восклицательный знак
                 const icon = badge.querySelector('i');
                 if (icon) {
                     icon.className = 'fa-solid fa-circle-exclamation me-1';

@@ -65,7 +65,6 @@
         color: #0d6efd;
     }
 
-    /* Подсветка полей с ошибками */
     .input-group-custom .is-invalid {
         border-color: #dc3545 !important;
         background-color: #fff8f8;
@@ -85,24 +84,20 @@
 {% block maincontent %}
 <div class="auth-wrapper">
     <div class="auth-card">
-        
-        <!-- Заголовок формы -->
+
         <div class="text-center mb-4">
             <h1 class="h3 fw-bold text-dark mb-2">Создать аккаунт</h1>
             <p class="text-muted small">Присоединяйтесь к ToDO и управляйте задачами эффективно</p>
         </div>
 
-        <!-- Вывод общей критической ошибки бэкенда (если есть) -->
         {% if errors and errors.main %}
         <div class="alert alert-danger border-0 rounded-3 shadow-sm mb-4 small" role="alert">
             <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errors.main }}
         </div>
         {% endif %}
 
-        <!-- Форма регистрации -->
         <form action="{{ url_for('register_user') }}" method="POST">
-            
-            <!-- Поле Username -->
+
             <div class="mb-3">
                 <label for="username" class="form-label small fw-semibold text-secondary">Имя пользователя</label>
                 <div class="input-group-custom">
@@ -121,7 +116,6 @@
                 {% endif %}
             </div>
 
-            <!-- Поле Email -->
             <div class="mb-3">
                 <label for="email" class="form-label small fw-semibold text-secondary">Электронная почта</label>
                 <div class="input-group-custom">
@@ -140,7 +134,6 @@
                 {% endif %}
             </div>
 
-            <!-- Поле Password -->
             <div class="mb-4">
                 <label for="password" class="form-label small fw-semibold text-secondary">Пароль</label>
                 <div class="input-group-custom">

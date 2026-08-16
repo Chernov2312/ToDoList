@@ -3,7 +3,6 @@
 {% block title %}Новая задача | ToDO{% endblock title %}
 
 {% block head %}
-<!-- Подключение FontAwesome для иконок -->
 <link rel="stylesheet" href="https://cloudflare.com">
 <style>
     :root {
@@ -15,7 +14,7 @@
     }
 
     .task-create-wrapper {
-        min-height: calc(100vh - 160px); /* Вычитаем примерную высоту header и footer */
+        min-height: calc(100vh - 160px);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -47,8 +46,6 @@
         box-shadow: var(--focus-ring);
         outline: none;
     }
-
-    /* Мягкая подсветка ошибок */
     .form-control-custom.is-invalid, .form-select-custom.is-invalid {
         border-color: #dc3545 !important;
         background-color: #fff8f8;
@@ -59,15 +56,11 @@
 {% block maincontent %}
 <div class="task-create-wrapper">
     <div class="task-create-card">
-        
-        <!-- Кнопка возврата назад -->
         <div class="mb-4">
             <a href="/todo/v1/tasks" class="btn btn-link text-decoration-none text-secondary p-0 small fw-semibold">
                 <i class="fa-solid fa-arrow-left me-1"></i> Вернуться к списку
             </a>
         </div>
-
-        <!-- Заголовок карточки -->
         <div class="d-flex align-items-center mb-4">
             <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-2 me-3 d-flex align-items-center justify-content-center" style="width: 46px; height: 46px;">
                 <i class="fa-solid fa-plus fs-4"></i>
@@ -77,18 +70,12 @@
                 <p class="text-muted small mb-0">Что планируете сделать сегодня?</p>
             </div>
         </div>
-
-        <!-- Вывод общей критической ошибки бэкенда (если есть) -->
         {% if errors and errors.main %}
         <div class="alert alert-danger border-0 rounded-3 shadow-sm mb-4 small" role="alert">
             <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errors.main }}
         </div>
         {% endif %}
-
-        <!-- Форма создания таска -->
         <form action="{{ url_for('create_task') }}" method="POST" id="create-task-form">
-            
-            <!-- Поле: Название задачи -->
             <div class="mb-3">
                 <label for="task_title" class="form-label small fw-semibold text-secondary">Название задачи</label>
                 <input type="text" 
@@ -105,8 +92,6 @@
                 <div class="text-danger small mt-1 ps-1">{{ errors.title }}</div>
                 {% endif %}
             </div>
-
-            <!-- Поле: Описание задачи (необязательное) -->
             <div class="mb-3">
                 <label for="task_description" class="form-label small fw-semibold text-secondary">Подробное описание</label>
                 <textarea class="form-control form-control-custom {% if errors and errors.description %}is-invalid{% endif %}" 
@@ -119,16 +104,11 @@
                 <div class="text-danger small mt-1 ps-1">{{ errors.description }}</div>
                 {% endif %}
             </div>
-
-            <!-- Дополнительные параметры: Дедлайн и Приоритет -->
             <div class="row g-3 mb-4">
-                
-                <!-- Дата выполнения -->
                 <div class="col-sm-6">
                     <label for="task_due_date" class="form-label small fw-semibold text-secondary">
                         <i class="fa-regular fa-calendar me-1"></i> Срок выполнения
                     </label>
-                    <!-- Изменено: type="datetime-local" вместо type="date" -->
                     <input type="datetime-local" 
                         class="form-control form-control-custom {% if errors and errors.deadline %}is-invalid{% endif %}" 
                         id="task_due_date" 
@@ -139,7 +119,6 @@
                     {% endif %}
                 </div>
 
-                <!-- Приоритет задачи -->
                 <div class="col-sm-6">
                     <label for="task_priority" class="form-label small fw-semibold text-secondary">
                         <i class="fa-solid fa-layer-group me-1"></i> Приоритет
@@ -153,7 +132,6 @@
 
             </div>
 
-            <!-- Кнопки управления -->
             <div class="d-flex justify-content-end gap-2 pt-2 border-top border-light-subtle">
                 <a href="/todo/v1/tasks" class="btn btn-light rounded-3 px-4 fw-medium text-secondary d-flex align-items-center">
                     Отмена

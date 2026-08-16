@@ -3,7 +3,6 @@
 {% block title %}Вход в аккаунт | ToDO{% endblock title %}
 
 {% block head %}
-<!-- Подключение иконок FontAwesome -->
 <link rel="stylesheet" href="https://cloudflare.com">
 <style>
     :root {
@@ -15,7 +14,7 @@
     }
 
     .auth-wrapper {
-        min-height: calc(100vh - 160px); /* Вычитаем примерную высоту header и footer */
+        min-height: calc(100vh - 160px);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -66,7 +65,6 @@
         color: #0d6efd;
     }
 
-    /* Мягкая подсветка ошибок */
     .input-group-custom .is-invalid {
         border-color: #dc3545 !important;
         background-color: #fff8f8;
@@ -87,13 +85,11 @@
 <div class="auth-wrapper">
     <div class="auth-card">
         
-        <!-- Заголовок формы -->
         <div class="text-center mb-4">
             <h1 class="h3 fw-bold text-dark mb-2">Войти в ToDO</h1>
             <p class="text-muted small">С возвращением! Введите свои данные для входа</p>
         </div>
 
-        <!-- Flash-сообщение о необходимости войти -->
         {% if flash_message %}
             <div class="alert alert-warning border-0 rounded-3 shadow-sm mb-4 d-flex align-items-center" role="alert">
                 <i class="fa-solid fa-circle-exclamation fs-5 timetable-icon me-2 text-warning"></i>
@@ -103,7 +99,6 @@
             </div>
         {% endif %}
 
-        <!-- Flash-сообщение об успешной регистрации -->
         {% if registered %}
             <div class="alert alert-success border-0 rounded-3 shadow-sm mb-4 d-flex align-items-center" role="alert">
                 <i class="fa-solid fa-circle-check fs-5 me-2 text-success"></i>
@@ -113,7 +108,6 @@
             </div>
         {% endif %}
 
-        <!-- Общая ошибка авторизации (Неверный пароль/логин) -->
         {% if errors and errors.main %}
             <div class="alert alert-danger border-0 rounded-3 shadow-sm mb-4 d-flex align-items-center" role="alert">
                 <i class="fa-solid fa-triangle-exclamation fs-5 me-2 text-danger"></i>
@@ -123,10 +117,8 @@
             </div>
         {% endif %}
 
-        <!-- Форма авторизации -->
         <form action="{{ url_for('login_user') }}" method="POST">
             
-            <!-- Поле Username -->
             <div class="mb-3">
                 <label for="username" class="form-label small fw-semibold text-secondary">Имя пользователя</label>
                 <div class="input-group-custom">
@@ -142,7 +134,6 @@
                 </div>
             </div>
 
-            <!-- Поле Password -->
             <div class="mb-4">
                 <label for="password" class="form-label small fw-semibold text-secondary">Пароль</label>
                 <div class="input-group-custom">
@@ -157,13 +148,11 @@
                 </div>
             </div>
 
-            <!-- Кнопка отправки -->
             <button type="submit" class="btn btn-primary w-100 btn-login shadow-sm mb-3">
                 Войти в аккаунт
             </button>
         </form>
 
-        <!-- Ссылка на переход к регистрации -->
         <div class="text-center pt-2">
             <p class="small text-muted mb-0">
                 Ещё нет аккаунта? <a href="/auth/register" class="text-decoration-none fw-semibold">Зарегистрироваться</a>
