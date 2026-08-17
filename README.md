@@ -5,6 +5,7 @@
 ### Предварительные требования
 
 - [Python 3.11+](https://www.python.org/downloads/)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [Git](https://git-scm.com/downloads)
 
 ### Установка и запуск
@@ -18,46 +19,10 @@ git clone
 2. Переход в папку проекта
 
 ```bash
-cd team-3
+cd ToDoList
 ```
 
-3. Создание виртуального окружения
-
-Linux/macOS
-
-```bash
-python3 -m venv venv
-```
-
-Windows (PowerShell)
-
-```powershell
-python -m venv venv
-```
-
-4. Активация виртуального окружения
-
-Linux/macOS
-
-```bash
-source venv/bin/activate
-```
-
-Windows (PowerShell)
-
-```powershell
-.\venv\Scripts\Activate.ps1
-```
-
-5. Установка зависимостей
-
-Для запуска проекта
-
-```bash
-pip install -r requirements/prod.txt
-```
-
-6. Настройка переменных окружения
+3. Настройка переменных окружения
 
 Linux/macOS
 
@@ -71,6 +36,9 @@ Windows (PowerShell)
 Copy-Item .env.example .env
 ```
 
+4. Запуск проекта
+```bash
+docker-compose up --build
 ```
 
 ---
@@ -129,7 +97,7 @@ flake8
 black --check .
 ```
 
-Тесты Django
+Тесты PyTest
 ```bash
 python3 manage.py test
 ```
